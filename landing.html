@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Agro-Onyx — Multi-chain DeFi aggregator backend for Solana, Onyx, and Uniswap. Intelligent swap routing, liquidity aggregation, and real-time market math.">
+  <title>Agro-Onyx — Multi-Chain DeFi Aggregator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       DESIGN SYSTEM
+       ================================================================ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:    #06060c;
+      --bg-surface: rgba(12, 12, 22, 0.72);
+      --glass:      rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.09);
+      --glass-hover-border: rgba(255, 255, 255, 0.16);
+      --text-primary: rgba(255, 255, 255, 0.92);
+      --text-secondary: rgba(255, 255, 255, 0.52);
+      --text-tertiary: rgba(255, 255, 255, 0.28);
+      --accent-gold: #c4a35a;
+      --accent-gold-dim: rgba(196, 163, 90, 0.15);
+      --accent-warm: #e8a855;
+      --accent-blue: #6e8fd8;
+      --accent-violet: #a78bfa;
+      --accent-pink: #f472b6;
+      --accent-emerald: #34d399;
+      --accent-cyan: #22d3ee;
+      --accent-orange: #fb923c;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+      --shadow-card-hover: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+      --transition: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ================================================================
+       ASCII BACKGROUND LAYER
+       ================================================================ */
+    #ascii-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    #ascii-bg .art-row {
+      display: block;
+      width: fit-content;
+      margin-inline: auto;
+      white-space: pre;
+      font-family: Georgia, Palatino, "Times New Roman", serif;
+      font-size: 14px;
+      line-height: 16px;
+    }
+
+    #ascii-bg .w3 { font-weight: 300; }
+    #ascii-bg .w5 { font-weight: 500; }
+    #ascii-bg .w8 { font-weight: 800; }
+    #ascii-bg .it { font-style: italic; }
+    #ascii-bg .a1  { color: rgba(196,163,90,0.10); }
+    #ascii-bg .a2  { color: rgba(196,163,90,0.20); }
+    #ascii-bg .a3  { color: rgba(196,163,90,0.30); }
+    #ascii-bg .a4  { color: rgba(196,163,90,0.40); }
+    #ascii-bg .a5  { color: rgba(196,163,90,0.50); }
+    #ascii-bg .a6  { color: rgba(196,163,90,0.60); }
+    #ascii-bg .a7  { color: rgba(196,163,90,0.70); }
+    #ascii-bg .a8  { color: rgba(196,163,90,0.80); }
+    #ascii-bg .a9  { color: rgba(196,163,90,0.90); }
+    #ascii-bg .a10 { color: rgba(196,163,90,1.00); }
+
+    /* Gradient vignette over ASCII background */
+    #ascii-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, transparent 0%, var(--bg-deep) 100%),
+        linear-gradient(180deg, rgba(6,6,12,0.2) 0%, rgba(6,6,12,0.7) 40%, rgba(6,6,12,0.4) 100%);
+      pointer-events: none;
+    }
+
+    /* ================================================================
+       MAIN CONTENT
+       ================================================================ */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ---- Hero ---- */
+    .hero {
+      width: 100%;
+      max-width: 1100px;
+      padding: 72px 24px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-gold-dim);
+      background: rgba(196, 163, 90, 0.06);
+      font: 500 11px/1 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      animation: badge-in 0.8s ease-out both;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 6px var(--accent-gold);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font: 800 clamp(38px, 6.2vw, 72px)/1.04 'Inter', sans-serif;
+      letter-spacing: -0.03em;
+      background: linear-gradient(160deg, #ffffff 20%, var(--accent-gold) 55%, var(--accent-warm) 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 18px;
+      animation: hero-in 1s ease-out 0.15s both;
+    }
+
+    .hero .tagline {
+      max-width: 640px;
+      font: 400 clamp(15px, 1.8vw, 18px)/1.65 'Inter', sans-serif;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      animation: hero-in 1s ease-out 0.3s both;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: hero-in 1s ease-out 0.45s both;
+    }
+
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-warm) 100%);
+      color: #0a0a12;
+      font: 600 14px/1 'Inter', sans-serif;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 12px rgba(196,163,90,0.3);
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(196,163,90,0.45);
+    }
+
+    .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      color: var(--text-primary);
+      font: 500 14px/1 'Inter', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: all var(--transition);
+    }
+
+    .cta-secondary:hover {
+      background: var(--glass-hover);
+      border-color: var(--glass-hover-border);
+    }
+
+    .install-snippet {
+      margin-top: 22px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.35);
+      font: 400 13px/1.4 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      backdrop-filter: blur(8px);
+      user-select: all;
+      animation: hero-in 1s ease-out 0.55s both;
+    }
+
+    .install-snippet .cmd { color: var(--accent-gold); }
+
+    /* ---- Button Grid ---- */
+    .grid-section {
+      width: 100%;
+      max-width: 1100px;
+      padding: 64px 24px 80px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font: 500 11px/1 'JetBrains Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 28px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--glass-border), transparent);
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    /* ---- Card Buttons ---- */
+    .card-btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 22px 20px 20px;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      animation: card-in 0.7s ease-out both;
+    }
+
+    .card-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      opacity: 0;
+      transition: opacity var(--transition);
+      pointer-events: none;
+    }
+
+    .card-btn:hover {
+      transform: translateY(-3px);
+      border-color: var(--glass-hover-border);
+      background: var(--glass-hover);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .card-btn:hover::before {
+      opacity: 1;
+    }
+
+    .card-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .card-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform var(--transition);
+    }
+
+    .card-btn:hover .card-icon {
+      transform: scale(1.08);
+    }
+
+    .card-btn h3 {
+      font: 600 15px/1.25 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .card-btn p {
+      font: 400 12.5px/1.5 'Inter', sans-serif;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .card-tag {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font: 500 10px/1.6 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Card color accents */
+    .card-btn.gold .card-icon    { background: rgba(196,163,90,0.15); color: var(--accent-gold); }
+    .card-btn.gold::before       { background: radial-gradient(circle at 30% 20%, rgba(196,163,90,0.06) 0%, transparent 70%); }
+    .card-btn.gold .card-tag     { background: rgba(196,163,90,0.1); color: var(--accent-gold); }
+
+    .card-btn.blue .card-icon    { background: rgba(110,143,216,0.15); color: var(--accent-blue); }
+    .card-btn.blue::before       { background: radial-gradient(circle at 30% 20%, rgba(110,143,216,0.06) 0%, transparent 70%); }
+    .card-btn.blue .card-tag     { background: rgba(110,143,216,0.1); color: var(--accent-blue); }
+
+    .card-btn.violet .card-icon  { background: rgba(167,139,250,0.15); color: var(--accent-violet); }
+    .card-btn.violet::before     { background: radial-gradient(circle at 30% 20%, rgba(167,139,250,0.06) 0%, transparent 70%); }
+    .card-btn.violet .card-tag   { background: rgba(167,139,250,0.1); color: var(--accent-violet); }
+
+    .card-btn.pink .card-icon    { background: rgba(244,114,182,0.15); color: var(--accent-pink); }
+    .card-btn.pink::before       { background: radial-gradient(circle at 30% 20%, rgba(244,114,182,0.06) 0%, transparent 70%); }
+    .card-btn.pink .card-tag     { background: rgba(244,114,182,0.1); color: var(--accent-pink); }
+
+    .card-btn.emerald .card-icon { background: rgba(52,211,153,0.15); color: var(--accent-emerald); }
+    .card-btn.emerald::before    { background: radial-gradient(circle at 30% 20%, rgba(52,211,153,0.06) 0%, transparent 70%); }
+    .card-btn.emerald .card-tag  { background: rgba(52,211,153,0.1); color: var(--accent-emerald); }
+
+    .card-btn.cyan .card-icon    { background: rgba(34,211,238,0.15); color: var(--accent-cyan); }
+    .card-btn.cyan::before       { background: radial-gradient(circle at 30% 20%, rgba(34,211,238,0.06) 0%, transparent 70%); }
+    .card-btn.cyan .card-tag     { background: rgba(34,211,238,0.1); color: var(--accent-cyan); }
+
+    .card-btn.orange .card-icon  { background: rgba(251,146,60,0.15); color: var(--accent-orange); }
+    .card-btn.orange::before     { background: radial-gradient(circle at 30% 20%, rgba(251,146,60,0.06) 0%, transparent 70%); }
+    .card-btn.orange .card-tag   { background: rgba(251,146,60,0.1); color: var(--accent-orange); }
+
+    /* ---- Footer ---- */
+    .footer {
+      width: 100%;
+      max-width: 1100px;
+      padding: 0 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font: 400 12px/1 'Inter', sans-serif;
+      color: var(--text-tertiary);
+    }
+
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .footer a:hover { color: var(--accent-gold); }
+
+    /* ================================================================
+       ANIMATIONS
+       ================================================================ */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes badge-in {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes hero-in {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Stagger card animations */
+    .card-btn:nth-child(1)  { animation-delay: 0.5s;  }
+    .card-btn:nth-child(2)  { animation-delay: 0.56s; }
+    .card-btn:nth-child(3)  { animation-delay: 0.62s; }
+    .card-btn:nth-child(4)  { animation-delay: 0.68s; }
+    .card-btn:nth-child(5)  { animation-delay: 0.74s; }
+    .card-btn:nth-child(6)  { animation-delay: 0.8s;  }
+    .card-btn:nth-child(7)  { animation-delay: 0.86s; }
+    .card-btn:nth-child(8)  { animation-delay: 0.92s; }
+    .card-btn:nth-child(9)  { animation-delay: 0.98s; }
+    .card-btn:nth-child(10) { animation-delay: 1.04s; }
+    .card-btn:nth-child(11) { animation-delay: 1.1s;  }
+    .card-btn:nth-child(12) { animation-delay: 1.16s; }
+    .card-btn:nth-child(13) { animation-delay: 1.22s; }
+    .card-btn:nth-child(14) { animation-delay: 1.28s; }
+    .card-btn:nth-child(15) { animation-delay: 1.34s; }
+    .card-btn:nth-child(16) { animation-delay: 1.4s;  }
+
+    /* ================================================================
+       RESPONSIVE
+       ================================================================ */
+    @media (max-width: 960px) {
+      .button-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .hero { padding-top: 48px; }
+      .button-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .card-btn { padding: 18px 16px 16px; }
+    }
+
+    @media (max-width: 440px) {
+      .button-grid { grid-template-columns: 1fr; }
+      .hero-cta-row { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======== ASCII Background ======== -->
+  <div id="ascii-bg" aria-hidden="true"></div>
+
+  <!-- ======== Main Content ======== -->
+  <div class="page-wrapper">
+
+    <!-- Hero -->
+    <header class="hero" id="hero">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Multi-Chain · DeFi Aggregator
+      </div>
+
+      <h1>Agro-Onyx</h1>
+
+      <p class="tagline">
+        Multi-chain DeFi aggregator backend powering intelligent swap routing across
+        <code style="color:var(--accent-gold); font-family:'JetBrains Mono',monospace; font-size: 0.92em;">Solana</code>,
+        <code style="color:var(--accent-violet); font-family:'JetBrains Mono',monospace; font-size: 0.92em;">Onyx</code>, and
+        <code style="color:var(--accent-cyan); font-family:'JetBrains Mono',monospace; font-size: 0.92em;">Uniswap</code>.
+        Real-time liquidity aggregation and optimized trade execution.
+      </p>
+
+      <div class="hero-cta-row">
+        <a class="cta-primary" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <a class="cta-secondary" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Backend Repo
+        </a>
+      </div>
+
+      <div class="install-snippet">
+        <span class="cmd">$</span> git clone https://github.com/deadSwank001/Agro-Onyx_Backend.git
+      </div>
+    </header>
+
+    <!-- 16-Button Grid -->
+    <section class="grid-section" id="features">
+      <div class="section-label">Trading Modules · 16 Endpoints</div>
+
+      <div class="button-grid">
+
+        <!-- 1: Solana Buy -->
+        <a class="card-btn gold" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-sol-buy">
+          <div class="card-icon">☀️</div>
+          <h3>Solana — Buy</h3>
+          <p>Execute SOL token buy orders via Jupiter Aggregator with optimal route discovery and slippage protection.</p>
+          <span class="card-tag">Solana</span>
+        </a>
+
+        <!-- 2: Solana Sell -->
+        <a class="card-btn gold" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-sol-sell">
+          <div class="card-icon">💰</div>
+          <h3>Solana — Sell</h3>
+          <p>Liquidate SPL token positions back to SOL/USDC with real-time price impact estimation.</p>
+          <span class="card-tag">Solana</span>
+        </a>
+
+        <!-- 3: Solana Swap Router -->
+        <a class="card-btn gold" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-sol-router">
+          <div class="card-icon">🔄</div>
+          <h3>Solana Swap Router</h3>
+          <p>Multi-hop route optimization across Raydium, Orca, and Jupiter for best execution price.</p>
+          <span class="card-tag">Solana</span>
+        </a>
+
+        <!-- 4: Solana Wallet -->
+        <a class="card-btn gold" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-sol-wallet">
+          <div class="card-icon">🔐</div>
+          <h3>Solana Wallet</h3>
+          <p>Keypair management, transaction signing, and balance monitoring on Devnet and Mainnet.</p>
+          <span class="card-tag">Solana</span>
+        </a>
+
+        <!-- 5: Onyx Buy -->
+        <a class="card-btn violet" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-onyx-buy">
+          <div class="card-icon">💎</div>
+          <h3>Onyx — Buy</h3>
+          <p>Acquire Onyx-chain tokens through the native DEX with limit and market order support.</p>
+          <span class="card-tag">Onyx</span>
+        </a>
+
+        <!-- 6: Onyx Sell -->
+        <a class="card-btn violet" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-onyx-sell">
+          <div class="card-icon">🪙</div>
+          <h3>Onyx — Sell</h3>
+          <p>Exit Onyx positions with intelligent order splitting to minimize slippage on thin books.</p>
+          <span class="card-tag">Onyx</span>
+        </a>
+
+        <!-- 7: Onyx Liquidity Pool -->
+        <a class="card-btn violet" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-onyx-lp">
+          <div class="card-icon">🏊</div>
+          <h3>Onyx LP Manager</h3>
+          <p>Provide and withdraw liquidity from Onyx AMM pools with impermanent loss tracking.</p>
+          <span class="card-tag">Onyx</span>
+        </a>
+
+        <!-- 8: Onyx Bridge -->
+        <a class="card-btn violet" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-onyx-bridge">
+          <div class="card-icon">🌉</div>
+          <h3>Onyx Bridge</h3>
+          <p>Cross-chain asset bridging between Onyx, Solana, and EVM networks with status tracking.</p>
+          <span class="card-tag">Onyx</span>
+        </a>
+
+        <!-- 9: Uniswap Buy -->
+        <a class="card-btn cyan" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-uni-buy">
+          <div class="card-icon">🦄</div>
+          <h3>Uniswap — Buy</h3>
+          <p>ERC-20 token acquisition via Uniswap V3 with concentrated liquidity tick-range routing.</p>
+          <span class="card-tag">Uniswap</span>
+        </a>
+
+        <!-- 10: Uniswap Sell -->
+        <a class="card-btn cyan" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-uni-sell">
+          <div class="card-icon">📤</div>
+          <h3>Uniswap — Sell</h3>
+          <p>Token-to-ETH/USDC swaps with MEV protection, deadline guards, and gas estimation.</p>
+          <span class="card-tag">Uniswap</span>
+        </a>
+
+        <!-- 11: Uniswap Pool Analytics -->
+        <a class="card-btn cyan" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-uni-analytics">
+          <div class="card-icon">📊</div>
+          <h3>Uniswap Analytics</h3>
+          <p>Real-time pool TVL, fee tier comparison, and historical volume data from on-chain events.</p>
+          <span class="card-tag">Uniswap</span>
+        </a>
+
+        <!-- 12: Aggregator — Price Engine -->
+        <a class="card-btn emerald" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-agg-price">
+          <div class="card-icon">📈</div>
+          <h3>Price Engine</h3>
+          <p>Cross-chain price oracle aggregating feeds from Pyth, Chainlink, and on-chain TWAP.</p>
+          <span class="card-tag">Aggregator</span>
+        </a>
+
+        <!-- 13: Aggregator — Slippage Calculator -->
+        <a class="card-btn emerald" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-agg-slippage">
+          <div class="card-icon">🧮</div>
+          <h3>Slippage Math</h3>
+          <p>Dynamic slippage tolerance based on pool depth, order size, and historical volatility curves.</p>
+          <span class="card-tag">Aggregator</span>
+        </a>
+
+        <!-- 14: Aggregator — Route Optimizer -->
+        <a class="card-btn emerald" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-agg-router">
+          <div class="card-icon">🗺️</div>
+          <h3>Route Optimizer</h3>
+          <p>Multi-DEX split routing algorithm that minimizes gas + slippage across parallel execution paths.</p>
+          <span class="card-tag">Aggregator</span>
+        </a>
+
+        <!-- 15: Aggregator — Arbitrage Scanner -->
+        <a class="card-btn orange" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-agg-arb">
+          <div class="card-icon">⚡</div>
+          <h3>Arb Scanner</h3>
+          <p>Cross-chain arbitrage detection between Solana, Onyx, and Uniswap with profitability estimation.</p>
+          <span class="card-tag">Aggregator</span>
+        </a>
+
+        <!-- 16: Aggregator — Risk Engine -->
+        <a class="card-btn orange" href="https://github.com/deadSwank001/Agro-Onyx_Backend" target="_blank" rel="noreferrer" id="btn-agg-risk">
+          <div class="card-icon">🛡️</div>
+          <h3>Risk Engine</h3>
+          <p>Position sizing, max drawdown guards, and portfolio exposure limits across all connected chains.</p>
+          <span class="card-tag">Aggregator</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>© 2025 Agro-Onyx · <a href="https://github.com/deadSwank001/Agro-Onyx_Backend">Agro-Onyx_Backend</a></span>
+      <span>Built by <a href="https://github.com/deadSwank001" target="_blank" rel="noreferrer">@deadSwank001</a></span>
+    </footer>
+
+  </div>
+
+  <script type="module" src="./landing.ts"></script>
+</body>
+</html>
